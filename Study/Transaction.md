@@ -152,3 +152,13 @@ public static class MemberDaoImpl extends JdbcDaoSupport implements MemberDao {
 - Checked Exception(compile time exception)과 Unchecked Exception(runtime exception)에 따른 transaction 처리
 ```
 
+## @Transcational(readOnly=true)
+- DB 데이터를 read할때 자주 사용하는 설정. 쓰면 최적화로 얻는 이득이 많다고 알고있다.
+- 해당 설정을 사용해서 얻는 이점은 무엇이고? 어차피 Read만 하니까 어노테이션 자체를 안써도 되지 않을까?
+
+#### 이점
+1. JPA를 쓸 경우 영속성 컨텍스트에 **스냅샷저장, 변경 감지 기능을 수행하지않아** 성능이 향상된다.
+2. MySQL을 사용할때 Master(CUD), Slave(읽기전용)처럼 DB가 이중화처리되어있을때 slave를 호출해서 DB 부하를 줄일 수 있다.
+3. 어노테이션과 설정을 명시적으로 사용하므로써 코드 읽기가 수월하다.
+
+
