@@ -161,4 +161,6 @@ public static class MemberDaoImpl extends JdbcDaoSupport implements MemberDao {
 2. MySQL을 사용할때 Master(CUD), Slave(읽기전용)처럼 DB가 이중화처리되어있을때 slave를 호출해서 DB 부하를 줄일 수 있다.
 3. 어노테이션과 설정을 명시적으로 사용하므로써 코드 읽기가 수월하다.
 
+#### 결론
+readOny=true 를 쓰는게 좋다!
 
