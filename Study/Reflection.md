@@ -58,3 +58,5 @@ public class UserController {
 ## 결론 
 - 위와 같이 런타임에 해당 어노테이션이 붙은 클래스를 탐색하고 발견한다면, 리플렉션을 통해 해당 클래스의 인스턴스를 생성하고 필요한 필드를 주입하여 Bean Factory에 저장하는 식으로 사용이 된다. 
 
+https://steady-coding.tistory.com/609
+https://tecoble.techcourse.co.kr/post/2020-07-16-reflection-api/
