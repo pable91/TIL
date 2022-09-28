@@ -21,7 +21,7 @@
         }
 ```
    
-2. 이 코드는 1 코드에서 가져온 클래스에서(@Controller붙어있는) @RequestMapping이 붙은 method들을 찾아서 저장하는 코드다.
+2. 이 코드는 1 코드에서 가져온 클래스에서(@Controller붙어있는) @RequestMapping이 붙은 method들을 찾아서 저장하는 코드다. HandlerKey는 @RequestMapping 속성으로 있는 value와 method를 포함하는 객체다. 
 ```
         Set<Method> methods = ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
 
