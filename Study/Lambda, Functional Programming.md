@@ -77,3 +77,4 @@ Java에는 자주 사용될 것 같은 함수형 인터페이스가 이미 정�
     
 https://mangkyu.tistory.com/113   
 http://www.tcpschool.com/java/java_lambda_concept   
+https://developer-talk.tistory.com/462
