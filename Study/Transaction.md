@@ -156,11 +156,23 @@ public static class MemberDaoImpl extends JdbcDaoSupport implements MemberDao {
 - DB 데이터를 read할때 자주 사용하는 설정. 쓰면 최적화로 얻는 이득이 많다고 알고있다.
 - 해당 설정을 사용해서 얻는 이점은 무엇이고? 어차피 Read만 하니까 어노테이션 자체를 안써도 되지 않을까?
 
-#### 이점
+### 이점
 1. JPA를 쓸 경우 영속성 컨텍스트에 **스냅샷저장, 변경 감지 기능을 수행하지않아** 성능이 향상된다.
 2. MySQL을 사용할때 Master(CUD), Slave(읽기전용)처럼 DB가 이중화처리되어있을때 slave를 호출해서 DB 부하를 줄일 수 있다.
 3. 어노테이션과 설정을 명시적으로 사용하므로써 코드 읽기가 수월하다.
 
-#### 결론
+### 결론
 readOny=true 를 쓰는게 좋다!
+
+# 격리레벨(isolation level)
+여러 트랜잭션이 동시에 DB 데이터에 접근했을때 데이터에 대한 격리 수준에 대한 설정이다.
+
+### 발생 할 수 있는 현상
+1. Dirty Read
+- A 트랜잭션이 commit되지 않았는데 도중에 B 트랜잭션이 데이터를 Read하고, A 트랜잭션이 Rollback 했을경우 B트랜잭션은 commit 되지 않은 잘못된 데이터를 읽게 되는 현상
+2. Non-Repeatable Read
+- 한 트랜잭션에서 쿼리를 두번 이상 실행했을 경우, 각자 다른 값이 나오는 현상
+3. Phantom Read
+- 한 트랜잭션에서 쿼리를 두번 이상 실행했을 경우, 나중 쿼리의 결과에서 데이터가 새롭게 조회되는 현상 
+
 
