@@ -167,12 +167,33 @@ readOny=true 를 쓰는게 좋다!
 # 격리레벨(isolation level)
 여러 트랜잭션이 동시에 DB 데이터에 접근했을때 데이터에 대한 격리 수준에 대한 설정이다.
 
-### 발생 할 수 있는 현상
+### 격리 레벨 설정에 따라 발생 할 수 있는 현상
 1. Dirty Read
-- A 트랜잭션이 commit되지 않았는데 도중에 B 트랜잭션이 데이터를 Read하고, A 트랜잭션이 Rollback 했을경우 B트랜잭션은 commit 되지 않은 잘못된 데이터를 읽게 되는 현상
-2. Non-Repeatable Read
-- 한 트랜잭션에서 쿼리를 두번 이상 실행했을 경우, 각자 다른 값이 나오는 현상
-3. Phantom Read
-- 한 트랜잭션에서 쿼리를 두번 이상 실행했을 경우, 나중 쿼리의 결과에서 데이터가 새롭게 조회되는 현상 
+    - A 트랜잭션이 commit되지 않았는데 도중에 B 트랜잭션이 데이터를 Read하고, A 트랜잭션이 Rollback 했을경우 B트랜잭션은 commit 되지 않은 잘못된 데이터를 읽게 되는 현상
+2. Non-Repeatable Read(Update 일 때 발생)
+    - 한 트랜잭션에서 쿼리를 두번 이상 실행했을 경우, 각자 다른 값이 나오는 현상
+3. Phantom Read(Insert,  Delete 일 떄 발생)
+    - 한 트랜잭션에서 쿼리를 두번 이상 실행했을 경우, 나중 쿼리의 결과에서 데이터가 새롭게 조회되는 현상 
 
+### 격리 레벨 설정
+1. Read Uncommitted(레벨0)
+    - A트랜잭션의 commit, rollback의 여부에 상관없이 B트랜잭션 접근이 모두 가능한 상태, 즉, 격리가 전혀 없는 설정
+    - Dirty Read, Non-Repeatable Read, Phantom Read 의 문제가 모두 발생할 수 있다.
+    - 데이터 정합성(일관성)이 전혀 맞지 않기때문에 많이 쓰이지 않는 설정
 
+2. Read Committed(레벨1)
+    - A트랜잭션이 commit이 완료되어야지만 B트랜잭션이 접근 할 수 있는 설정
+    - Non-Repeatable Read, Panthom Read의 문제가 발생할 수 있다.
+    - Oracle, SQL Server의 기본 설정이다.
+
+3. Repeatable Read(레벨2)
+    - A트랜잭션에서 update가 이루어지고, B 트랜잭션안에서 select 쿼리를 여러번 실행하더라도 같은 결과같이 반환되는 설정
+    - 즉, B트랜잭션이 commit되기전엔 조회한 데이터는 항상 같다.
+    - MySQL의 기본 설정이다
+    - Panthom Read의 문제만 발생한다.
+
+4. Serialize(레벨3)
+    - 한 트랜잭션에서 접근한 데이터를 다른 트랜잭션에서 접근 불가.
+    - 단순 select문이라도 트랜잭션이 커밋될때까지 모든 데이터에 잠금이 설정된다. 
+    - 데이터정합성은 가장 높으나 성능은 가장 떨어진다.
+    
