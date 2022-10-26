@@ -144,3 +144,26 @@ LegacyMapping은 각각 요청에 맞는 컨트롤러를 호출하고, Annotatio
 여기서 문득 들었던 생각은 Adaptor를 각각 만들지 않고 LegacyMapping과 AnnotationMapping 클래스에서 Adaptor들이 하는 작업을 모두 넣었으면 어땠을까?
 가장 먼저 들었던 생각은 책임을 너무 집중시켜서 Mapping 클래스 자체의 역할이 많아지는것이 단점인것 같다. 
 결국엔 어댑터 패턴을 사용해서 "실행부분"을 추상화 시켜 Adaptor 클래스를 만들었고, 책임을 분리시킨 것이 어댑터 패턴의 가장 큰 역할이자 장점이 아닐까 싶다.
+
+# 5단계
+지금까지 작업한 내용에서는 HttpServletRequest, HttpServletResponse 라는 파라미터를 고정적으로 썻어야했다.  
+
+```
+    @RequestMapping("/users")
+    public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("users findUserId");
+        return new ModelAndView(new JspView("/users/list.jsp"));
+    }
+   
+    @RequestMapping(value="/users/show", method=RequestMethod.GET)
+    public ModelAndView show(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("users findUserId");
+        return new ModelAndView(new JspView("/users/show.jsp"));
+    }
+   
+    @RequestMapping(value="/users", method=RequestMethod.POST)
+    public ModelAndView create(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("users create");
+        return new ModelAndView(new JspView("redirect:/users"));
+    }
+```
