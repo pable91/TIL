@@ -146,24 +146,60 @@ LegacyMapping은 각각 요청에 맞는 컨트롤러를 호출하고, Annotatio
 결국엔 어댑터 패턴을 사용해서 "실행부분"을 추상화 시켜 Adaptor 클래스를 만들었고, 책임을 분리시킨 것이 어댑터 패턴의 가장 큰 역할이자 장점이 아닐까 싶다.
 
 # 5단계
-지금까지 작업한 내용에서는 HttpServletRequest, HttpServletResponse 라는 파라미터를 고정적으로 썻어야했다.  
+지금까지 작업한 내용에서는 HttpServletRequest, HttpServletResponse 라는 파라미터를 고정으로 사용했어야했다. 그래야지 getParameter나 getSession으로 내가 원하는 값을 호출할 수 있기때문이었다. 하지만 매번 HttpServletRequest에서 필요한 데이터를 꺼내오는건 번거롭다. 그냥 내가 원하는 파라미터를 메소드에 선언하면 알아서 값이 바인딩 되었으면 좋겠다.
+
+그리고 실제 스프링 프레임워크처럼 @RequestBody, @PathVariable, @RequestParam도 사용하면 그에 맞는 기능이 동작했으면 좋겠다. 밑에 코드는 HttpServletRequest, HttpServletResponse를 무조건 써야하는 기존 코드다.
 
 ```
-    @RequestMapping("/users")
-    public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("users findUserId");
-        return new ModelAndView(new JspView("/users/list.jsp"));
+    @RequestMapping(value = "/users/create", method = RequestMethod.POST)
+    public ModelAndView createUser(HttpServletRequest req, HttpServletResponse resp) {
+        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"), req.getParameter("email"));
+        log.debug("User : {}", user);
+        DataBase.addUser(user);
+        return new ModelAndView(new RedirectView("redirect:/"));
     }
-   
-    @RequestMapping(value="/users/show", method=RequestMethod.GET)
-    public ModelAndView show(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("users findUserId");
-        return new ModelAndView(new JspView("/users/show.jsp"));
+
+    @RequestMapping(value = "/users/login", method = RequestMethod.POST)
+    public ModelAndView login(HttpServletRequest req, HttpServletResponse resp) {
+        String userId = req.getParameter("userId");
+        String password = req.getParameter("password");
+        User user = DataBase.findUserById(userId);
+        if (user == null) {
+            ModelAndView mv = new ModelAndView(new ForwardView("/user/login.jsp"));
+            mv.addObject("loginFailed", true);
+            return mv;
+        }
+
+        if (user.matchPassword(password)) {
+            HttpSession session = req.getSession();
+            session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
+            return new ModelAndView(new RedirectView("redirect:/"));
+        } else {
+            ModelAndView mv = new ModelAndView(new ForwardView("/user/login.jsp"));
+            mv.addObject("loginFailed", true);
+            return mv;
+        }
     }
-   
-    @RequestMapping(value="/users", method=RequestMethod.POST)
-    public ModelAndView create(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("users create");
-        return new ModelAndView(new JspView("redirect:/users"));
+    
+    @RequestMapping(value = "/users/logout", method = RequestMethod.GET)
+    public ModelAndView logout(HttpSession session) {
+        session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
+        return new ModelAndView(new RedirectView("redirect:/"));
     }
+    
+    @RequestMapping(value = "/users/update", method = RequestMethod.POST)
+    public ModelAndView update(HttpServletRequest req, HttpServletResponse resp)  {
+        User user = DataBase.findUserById(req.getParameter("userId"));
+        if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
+            throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
+        }
+
+        User updateUser = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
+                req.getParameter("email"));
+        log.debug("Update User : {}", updateUser);
+        user.update(updateUser);
+
+        return new ModelAndView(new RedirectView("redirect:/"));
+    }
+  
 ```
