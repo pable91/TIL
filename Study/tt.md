@@ -1,3 +1,4 @@
+# LegacyHandlerMapping
 기존 프로젝트는 클라이언트 요청 url에 대해 처리를 담당하는 각각의 Controller들을 가지고 있었다(이하 Legacy Handler Mapping)
 
 ```
@@ -23,6 +24,7 @@
 이 방법은 컨트롤러가 추가될 때마다 매번 (요청 URL) 과 (컨트롤러)를 수동으로 추가하는 작업이 필요하다.
 또한 추가하는 번거로움 동시에 Controller 구현체의 갯수도 계속 많아지기 때문에 유지보수성도 좋지않다.
 
+# LegacyHandlerMapping -> AnnotationHandlerMapping
 이러한 단점을 보완하기 위해 새로운 기능이 추가될 때마다 매번 컨트롤러를 추가하는 것이 아니라, Controller 하나에 연관있는 메서드들을 추가해서 사용하는것이 좋다. (이하 Annotation Handler Mapping)
 우리가 흔히 SpringFramework에서 사용하는 방법처럼...
 
@@ -52,7 +54,8 @@
 바꾸는 과정을 내가 작성한 코드를 토대로 설명해보고자 한다.
 상용 Spring Framework와는 살짝 다를 수도 있으니 유의하자.
 
-1. @Controller 어노테이션이 붙은 Controller 클래스들을 자바 리플렉션을 활용해서 찾는다.
+# 1단계
+@Controller 어노테이션이 붙은 Controller 클래스들을 자바 리플렉션을 활용해서 찾는다.
 ```
 public ControllerScanner() throws InstantiationException, IllegalAccessException {
         Reflections reflections = new Reflections("next.controller");
@@ -67,7 +70,8 @@ public ControllerScanner() throws InstantiationException, IllegalAccessException
 next.controller 하위 패키지에서 @Controller 어노테이션이 붙은 클래스들을 모두 가져온다.
 그리고 순회하면서 클래스 정보를 key, 클래스 객체를 value로 해서 Map에 저장한다.
 
-2. Controller 클래스 안에서 @RequestMapping 어노테이션이 붙어있는 메소드들을 전부 찾는다.
+# 2단계
+Controller 클래스 안에서 @RequestMapping 어노테이션이 붙어있는 메소드들을 전부 찾는다.
 
 
 ```
@@ -101,7 +105,8 @@ private HandlerKey createHandlerKey(Method method) {
 
 여기까지가 초기화 단계이다. 이제 실제로 사용자 요청이 들어왔을때 어떻게 동작하는지 살펴보자.
 
-3. 사용자 요청 정보가 DispatcherServler(=Front Controller)에 들어오면 LegacyMapping과 AnnotationMapping를 모두 순회하면서
+# 3단계
+사용자 요청 정보가 DispatcherServler(=Front Controller)에 들어오면 LegacyMapping과 AnnotationMapping를 모두 순회하면서
 요청정보(url, http method)에 해당하는 value값을 찾을 것이다. 여기서 value는 handler라고 한다. 이는 getHandler라는 메소드에서 담당한다.
 
 ```
@@ -117,7 +122,8 @@ private Object getHandler(HttpServletRequest request) {
     }
 ```
 
-4. 요청에 해당하는 handler를 찾은 후 어탭터 패턴을 사용해서 현재 handler의 실행 방식을 결정할 것이다.
+# 4단계
+요청에 해당하는 handler를 찾은 후 어탭터 패턴을 사용해서 현재 handler의 실행 방식을 결정할 것이다.
 
 ```
 ...
