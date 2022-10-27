@@ -240,6 +240,13 @@ LegacyMapping은 각각 요청에 맞는 컨트롤러를 호출하고, Annotatio
 
 
 # 6단계
+메소드에 선언된 파라미터들을 조회해서 resolver 실행 후 리턴값을 받아내는 코드들이다.
+참고로 메소드와 메소드 내의 정보들은 MethodParamter라는 클래스로 추상화하였다.
+
+- 메소드에 선언된 파라미터를 하나씩 확인한다(getParameterObject)
+- 파라미터를 실행시킬 수 있는 resolver를 찾는다.(supportParameter)
+- 선택된 resolver마다 각각 다른 실행 로직이 있을텐데, 실행 후 반환한다(resolveArgument) 
+
 ```
 public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
@@ -274,9 +281,9 @@ private Object getParameterObject(HttpServletRequest request, HttpServletRespons
     }
 ```
 
-- 메소드에 선언된 파라미터를 하나씩 확인한다(getParameterObject)
-- 파라미터를 실행시킬 수 있는 resolver를 찾는다.(supportParameter)
-- 선택된 resolver마다 각각 다른 실행 로직이 있을텐데, 실행 후 반환한다(resolveArgument) 
+
+# 7단계
+모든 Resolver 구현체들은 MethodArgumentResolver라는 인터페이스를 상속하고, 구현체에서는 supportParameter와 resolveArgument 메소드를 구현해야한다.
 
 나는 Resolver들을 다음과 같이 구현했고, 실제로 spring에서는 내가 구현한것보다 훨씬 더 많은 Resolver들이 있다.
 - HttpServlerArgumentResolver
@@ -286,7 +293,42 @@ private Object getParameterObject(HttpServletRequest request, HttpServletRespons
 - RequestBodyArgumentResolver
 - UserObjectTypeArgumentResolver
 
-모든 Resolver 구현체들은 MethodArgumentResolver라는 인터페이스를 상속하고, 구현체에서는 supportParameter와 resolveArgument 메소드를 구현해야한다.
+하나만 예를 들어보면 다음과 같다.
+### PrimitiveTypeArgumentResolver(어노테이션이 없고 PrimitiveType인 파라미터)
+```
+public class PrimitiveTypeArgumentResolver implements MethodArgumentResolver {
+
+    @Override
+    public boolean supportsParameter(MethodParameter parameter) {
+        Class<?> parameterType = parameter.getParameterType();
+
+        /**
+         * PathVariable 어노테이션이 있으면 PathVariableArgumentResolver 가 호출되어야한다.
+         */
+        if (parameter.getAnnotations().equals(PathVariable.class))
+            return false;
+
+        return (parameterType.isPrimitive() || parameterType.equals(String.class));
+    }
+
+    @Override
+    public Object resolveArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Class<?> parameterType = parameter.getParameterType();
+        String parameterName = parameter.getParameterName();
+        String object = request.getParameter(parameterName);
+
+        /**
+         * RequestParam은 url 끝에 query String을 통해 데이터를 요청한다.
+         */
+        if (!StringUtils.hasText(object)) {
+            if (isQueryString(request, parameterType, parameterName, object))
+                return ResolverUtility.convertPrimitiveType(parameterType, object);
+        }
+
+        return ResolverUtility.convertPrimitiveType(parameterType,object);
+    }
+
+```
 
 
 
