@@ -238,7 +238,47 @@ LegacyMapping은 각각 요청에 맞는 컨트롤러를 호출하고, Annotatio
 이 기능의 핵심 로직을 설명하자면 현재 실행되어야하는 Hanlder가 정해진 후 해당 메소드에 정의된 파라미터들을 순회하면서 어떤 방법으로 실행될 수 있는지 확인한다. 여기서 어떤 방법이란 Resolver를 의미한다.
 즉, 각각의 파라미터의 실행여부를 확인하고, 실행까지 할 수 있는 추상화된 클래스가 Resolver다.
 
-나는 MethodArgumentResolver라는 인터페이스를 구현하고 구현체로 다음과 같은 Resolver들을 구현했다.
+
+# 6단계
+```
+public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+        String[] parameterNames = nameDiscoverer.getParameterNames(method);
+        Parameter[] parameters = method.getParameters();
+
+        Object[] parameterObjs = new Object[parameterNames.length];
+
+        if(parameterObjs.length == 0) {
+            return (ModelAndView) method.invoke(controller);
+        }
+
+        for (int i = 0; i < parameterObjs.length; ++i) {
+            MethodParameter methodParameter = new MethodParameter(method, parameterNames[i], parameters[i]);
+            parameterObjs[i] = getParameterObject(request, response, methodParameter);
+        }
+
+        return (ModelAndView) method.invoke(controller, parameterObjs);
+    }
+```
+
+```
+private Object getParameterObject(HttpServletRequest request, HttpServletResponse response, MethodParameter methodParameter) throws IOException {
+        for (MethodArgumentResolver methodArgumentResolver : list) {
+            if(methodArgumentResolver.supportsParameter(methodParameter)) {
+                System.out.println("methodArgumentResolver -> {} " + methodArgumentResolver);
+                return methodArgumentResolver.resolveArgument(methodParameter, request, response);
+            }
+        }
+
+        throw new NotFoundResolverException("실행 할 수 있는 Method Resolver 가 없습니다.");
+    }
+```
+
+- 메소드에 선언된 파라미터를 하나씩 확인한다(getParameterObject)
+- 파라미터를 실행시킬 수 있는 resolver를 찾는다.(supportParameter)
+- 선택된 resolver마다 각각 다른 실행 로직이 있을텐데, 실행 후 반환한다(resolveArgument) 
+
+나는 Resolver들을 다음과 같이 구현했고, 실제로 spring에서는 내가 구현한것보다 훨씬 더 많은 Resolver들이 있다.
 - HttpServlerArgumentResolver
 - HttpSessionResolver
 - PathVaribableArgumentResolver
@@ -246,7 +286,7 @@ LegacyMapping은 각각 요청에 맞는 컨트롤러를 호출하고, Annotatio
 - RequestBodyArgumentResolver
 - UserObjectTypeArgumentResolver
 
-
+모든 Resolver 구현체들은 MethodArgumentResolver라는 인터페이스를 상속하고, 구현체에서는 supportParameter와 resolveArgument 메소드를 구현해야한다.
 
 
 
