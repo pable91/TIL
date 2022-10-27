@@ -145,7 +145,10 @@ LegacyMapping은 각각 요청에 맞는 컨트롤러를 호출하고, Annotatio
 가장 먼저 들었던 생각은 책임을 너무 집중시켜서 Mapping 클래스 자체의 역할이 많아지는것이 단점인것 같다. 
 결국엔 어댑터 패턴을 사용해서 "실행부분"을 추상화 시켜 Adaptor 클래스를 만들었고, 책임을 분리시킨 것이 어댑터 패턴의 가장 큰 역할이자 장점이 아닐까 싶다.
 
+여기까지 이제 완료하면 AnnotationMapping 기반의 프레임워크는 완성되었다.
+
 # 5단계
+어노테이션 기반의 프레임워크는 완료되었지만 좀 더 리팩토링 할 부분이 있다.
 지금까지 작업한 내용에서는 HttpServletRequest, HttpServletResponse 라는 파라미터를 고정으로 사용했어야했다. 그래야지 getParameter나 getSession으로 내가 원하는 값을 호출할 수 있기때문이었다. 하지만 매번 HttpServletRequest에서 필요한 데이터를 꺼내오는건 번거롭다. 그냥 내가 원하는 파라미터를 메소드에 선언하면 알아서 값이 바인딩 되었으면 좋겠다.
 
 그리고 실제 스프링 프레임워크처럼 @RequestBody, @PathVariable, @RequestParam도 사용하면 그에 맞는 기능이 동작했으면 좋겠다. 밑에 코드는 HttpServletRequest, HttpServletResponse를 무조건 써야하는 기존 코드다.
@@ -203,3 +206,50 @@ LegacyMapping은 각각 요청에 맞는 컨트롤러를 호출하고, Annotatio
     }
   
 ```
+
+이런식으로 변경하려고 한다.
+```
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public ModelAndView create_string(String userId, String password) {
+        logger.debug("userId: {}, password: {}", userId, password);
+        return null;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public ModelAndView create_int_long(long id, int age) {
+        logger.debug("id: {}, age: {}", id, age);
+        return null;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public ModelAndView create_javabean(TestUser testUser) {
+        logger.debug("testUser: {}", testUser);
+        return null;
+    }
+
+
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+    public ModelAndView show_pathvariable(@PathVariable long id) {
+        logger.debug("userId: {}", id);
+        return null;
+    }
+```
+
+이 기능의 핵심 로직을 설명하자면 현재 실행되어야하는 Hanlder가 정해진 후 해당 메소드에 정의된 파라미터들을 순회하면서 어떤 방법으로 실행될 수 있는지 확인한다. 여기서 어떤 방법이란 Resolver를 의미한다.
+즉, 각각의 파라미터의 실행여부를 확인하고, 실행까지 할 수 있는 추상화된 클래스가 Resolver다.
+
+나는 MethodArgumentResolver라는 인터페이스를 구현하고 구현체로 다음과 같은 Resolver들을 구현했다.
+- HttpServlerArgumentResolver
+- HttpSessionResolver
+- PathVaribableArgumentResolver
+- PrimitiveTypeArgumentResolver
+- RequestBodyArgumentResolver
+- UserObjectTypeArgumentResolver
+
+
+
+
+
+
+
+
