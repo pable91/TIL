@@ -39,6 +39,18 @@
 - 요소들을 대상으로 특정한 연산을 수행하고 싶을때 사용하는 메서드 
 - peek()는 중간연산이고 Stream을 반환하는 반면 forEach는 최종연산으로 반환값이 존재하지않는다.
 
+# Null Safe Stream 생성하기
+- NullPointerException을 방지하고, null 여부 검사코드를 대신 해주는 Stream을 Optional을 통해서 생성 할 수 있다.
+```
+public <T> Stream<T> collectionToStream(Collection<T> collection) {
+    return Optional
+      .ofNullable(collection)
+      .map(Collection::stream)
+      .orElseGet(Stream::empty);
+  }
+```
+- ***하지만 Null이 발생활 확률이 높을 경우에만 이러한 코드를 적용하는것이 바람직하다.***
+
 
 # 실행순서
 - ***Stream은 수직적 구조로 순회한다.***
