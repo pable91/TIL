@@ -290,7 +290,6 @@ private Object getParameterObject(HttpServletRequest request, HttpServletRespons
 - HttpSessionResolver
 - PathVaribableArgumentResolver
 - PrimitiveTypeArgumentResolver
-- RequestBodyArgumentResolver
 - UserObjectTypeArgumentResolver
 
 하나만 예를 들어보면 다음과 같다.
