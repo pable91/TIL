@@ -3,12 +3,12 @@ mvc 프레임워크의 주요 기능을 구현하는 과정을 정리하였음.
 - @controller 어노테이션 찾아서 관리
 - @RequestMapping 어노테이션 찾아서 관리
 - @RequestMapping에 정의되어있는 메소드의 정보를 관리
-- 
-
+- handler를 실행시키는 HandlerAdapter 구현
+- 메소드의 파라미터를 파싱하는 MethodArgumentResolver 구현 
 
 ---
 
-### LegacyHandlerMapping
+### LegacyHandlerMapping(레거시)
 기존 프로젝트는 클라이언트 요청 url에 대해 처리를 담당하는 각각의 Controller들을 가지고 있었다(이하 Legacy Handler Mapping)
 
 ```
