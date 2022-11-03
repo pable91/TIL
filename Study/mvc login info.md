@@ -1,4 +1,14 @@
-# LegacyHandlerMapping
+# MVC 프레임워크
+mvc 프레임워크의 주요 기능을 구현하는 과정을 정리하였음.
+- @controller 어노테이션 찾아서 관리
+- @RequestMapping 어노테이션 찾아서 관리
+- @RequestMapping에 정의되어있는 메소드의 정보를 관리
+- 
+
+
+---
+
+### LegacyHandlerMapping
 기존 프로젝트는 클라이언트 요청 url에 대해 처리를 담당하는 각각의 Controller들을 가지고 있었다(이하 Legacy Handler Mapping)
 
 ```
@@ -24,7 +34,7 @@
 이 방법은 컨트롤러가 추가될 때마다 매번 (요청 URL) 과 (컨트롤러)를 수동으로 추가하는 작업이 필요하다.
 또한 추가하는 번거로움 동시에 Controller 구현체의 갯수도 계속 많아지기 때문에 유지보수성도 좋지않다.
 
-# LegacyHandlerMapping -> AnnotationHandlerMapping
+### LegacyHandlerMapping -> AnnotationHandlerMapping
 이러한 단점을 보완하기 위해 새로운 기능이 추가될 때마다 매번 컨트롤러를 추가하는 것이 아니라, Controller 하나에 연관있는 메서드들을 추가해서 사용하는것이 좋다. (이하 Annotation Handler Mapping)
 우리가 흔히 SpringFramework에서 사용하는 방법처럼...
 
@@ -54,7 +64,7 @@
 바꾸는 과정을 내가 작성한 코드를 토대로 설명해보고자 한다.
 상용 Spring Framework와는 살짝 다를 수도 있으니 유의하자.
 
-# 1단계
+### 1단계
 @Controller 어노테이션이 붙은 Controller 클래스들을 자바 리플렉션을 활용해서 찾는다.
 ```
 public ControllerScanner() throws InstantiationException, IllegalAccessException {
@@ -70,7 +80,7 @@ public ControllerScanner() throws InstantiationException, IllegalAccessException
 next.controller 하위 패키지에서 @Controller 어노테이션이 붙은 클래스들을 모두 가져온다.
 그리고 순회하면서 클래스 정보를 key, 클래스 객체를 value로 해서 Map에 저장한다.
 
-# 2단계
+### 2단계
 Controller 클래스 안에서 @RequestMapping 어노테이션이 붙어있는 메소드들을 전부 찾는다.
 
 
@@ -105,7 +115,7 @@ private HandlerKey createHandlerKey(Method method) {
 
 여기까지가 초기화 단계이다. 이제 실제로 사용자 요청이 들어왔을때 어떻게 동작하는지 살펴보자.
 
-# 3단계
+### 3단계
 사용자 요청 정보가 DispatcherServler(=Front Controller)에 들어오면 LegacyMapping과 AnnotationMapping를 모두 순회하면서
 요청정보(url, http method)에 해당하는 value값을 찾을 것이다. 여기서 value는 handler라고 한다. 이는 getHandler라는 메소드에서 담당한다.
 
@@ -122,7 +132,7 @@ private Object getHandler(HttpServletRequest request) {
     }
 ```
 
-# 4단계
+### 4단계
 요청에 해당하는 handler를 찾은 후 어탭터 패턴을 사용해서 현재 handler의 실행 방식을 결정할 것이다.
 
 ```
@@ -147,7 +157,7 @@ LegacyMapping은 각각 요청에 맞는 컨트롤러를 호출하고, Annotatio
 
 여기까지 이제 완료하면 AnnotationMapping 기반의 프레임워크는 완성되었다.
 
-# 5단계
+### 5단계
 어노테이션 기반의 프레임워크는 완료되었지만 좀 더 리팩토링 할 부분이 있다.
 지금까지 작업한 내용에서는 HttpServletRequest, HttpServletResponse 라는 파라미터를 고정으로 사용했어야했다. 그래야지 getParameter나 getSession으로 내가 원하는 값을 호출할 수 있기때문이었다. 하지만 매번 HttpServletRequest에서 필요한 데이터를 꺼내오는건 번거롭다. 그냥 내가 원하는 파라미터를 메소드에 선언하면 알아서 값이 바인딩 되었으면 좋겠다.
 
@@ -239,7 +249,7 @@ LegacyMapping은 각각 요청에 맞는 컨트롤러를 호출하고, Annotatio
 즉, 각각의 파라미터의 실행여부를 확인하고, 실행까지 할 수 있는 추상화된 클래스가 Resolver다.
 
 
-# 6단계
+### 6단계
 메소드에 선언된 파라미터들을 조회해서 resolver 실행 후 리턴값을 받아내는 코드들이다.
 참고로 메소드와 메소드 내의 정보들은 MethodParamter라는 클래스로 추상화하였다.
 
@@ -282,7 +292,7 @@ private Object getParameterObject(HttpServletRequest request, HttpServletRespons
 ```
 
 
-# 7단계
+### 7단계
 모든 Resolver 구현체들은 MethodArgumentResolver라는 인터페이스를 상속하고, 구현체에서는 supportParameter와 resolveArgument 메소드를 구현해야한다.
 
 나는 Resolver들을 다음과 같이 구현했고, 실제로 spring에서는 내가 구현한것보다 훨씬 더 많은 Resolver들이 있다.
