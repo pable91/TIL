@@ -13,9 +13,21 @@
 이경우엔 필드에 final 키워드만 붙여주면 해당 객체는 불변객체를 보장한다. 
 final 필드를 사용하기때문에 setter 메소드 또한 존재할 수 없다.
 
+```
+public class Lotto {
+    private final int number;
+}
+```
+
 ### Case2 | 객체 필드가 reference type일 경우
 이경우엔 참조 필드에 final 키워드를 쓰더라도 참조 필드의 get, set 메소드에 의해 
 참조 필드의 상태값을 수정할 수 있다. 그러므로 참조 필드 내부의 상태값도 final을 붙여서 불변 객체로 만들어야한다.
+
+```
+public class Lotto {
+    private final Number number;
+}
+```
 
 ### Case3 | 객체 필드가 Collection일 경우
 이 경우에 Collection에 final 키워드를 쓰고 다음과 같이 생성자에서 다른 Collection에 의해 초기화 된다고 가정해보자.
@@ -25,15 +37,15 @@ public class Bucket {
 
     private final List<Data> list;
     
-    public Bucket(List<Data> list) {
-        this.list = list;
+    public Bucket(List<Data> tmpList) {
+        this.list = tmpList;
     }
 }
 
 ```
 
-위와 같이 사용한다면 객체의 Collection은 얕은복사로 주소의 참조를 복사하게 되고, 만약 매개변수의 Collection을 수정하면
-객체의 Collection의 값도 자동으로 변경되게 된다. 이는 불변성을 깨뜨린다.
+위와 같이 사용한다면 객체의 Collection은 얕은복사로 주소의 참조를 복사하게 되고, 만약 매개변수(tmpList) Collection 원소들을 add, remove 하게 되면
+객체의 Collection(list)의 원소들도 자동으로 add, remove하게 된다. 이는 불변성을 깨뜨린다.
 그래서 이때는 생성자에서 방어적 복사로 필드를 초기화해줘야한다. 그러면 기존 Collection와의 참조를 끊고 복사되기 때문에 
 외부에서 Collection에서 수정하더라도 내부 필드는 변경되지 않는다 (* 얕은 복사, 깊은 복사, 방어적 복사의 차이점을 알아야한다)
 
