@@ -63,6 +63,6 @@
   - Service계층이 비대해진다.
   - LazyInitializationException 발생을 예방 가능하다.
 
-[출처] https://stella-ul.tistory.com/163
-[출처] https://velog.io/@jsb100800/Spring-boot-DTO-Entity-%EA%B0%84-%EB%B3%80%ED%99%98-%EC%96%B4%EB%8A%90-Layer%EC%97%90%EC%84%9C-%ED%95%98%EB%8A%94%EA%B2%8C-%EC%A2%8B%EC%9D%84%EA%B9%8C
+[출처] https://stella-ul.tistory.com/163   
+[출처] https://velog.io/@jsb100800/Spring-boot-DTO-Entity-%EA%B0%84-%EB%B3%80%ED%99%98-%EC%96%B4%EB%8A%90-Layer%EC%97%90%EC%84%9C-%ED%95%98%EB%8A%94%EA%B2%8C-%EC%A2%8B%EC%9D%84%EA%B9%8C   
 [출처] https://sedangdang.tistory.com/296
