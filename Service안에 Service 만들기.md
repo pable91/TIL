@@ -97,9 +97,7 @@ public class OrderBuyService {
 - 중복코드가 존재한다. 예를 들어 bookRepository.findById는 여러 Service 코드에 존재한다. 하지만 현재 코드는 내가 직접 작성하기때문에 쓸데없는 중복코드가 발생한다. 그리고 같은 코드를 작성하기때문에 버그가 발생될 가능성도 있다.
 
 ### 해결책
-- Repository와 1:1 매핑되는 또 하나의 Service 계층을 구현하였다(네이밍은 ~QueryService로 구현하였음)
-- 이렇게 하면 기존 여러 Service들에서 ~QueryService의 메소드를 재사용하기때문에 중복코드가 제거된다. 즉, 재사용성이 증가와 코드가 좀 더 깔끔해진다.
-- 하지만 Service 계층을 새롭게 추가했기때문에 해당 코드도 테스트 코드 작성을 해야하는 번거로움이 있었다.
+- Repository와 1:1 매핑되는 또 하나의 Service 계층을 구현하였고, 이를 기존 Service에서 사용한다(네이밍은 ~QueryService로 구현하였음)
 
 # Service 코드(수정후)
 ```
@@ -148,3 +146,8 @@ public class BookUpdateService {
     ...
     ...
 ```
+
+### 결과
+- 이렇게 하면 기존 여러 Service들에서 ~QueryService의 메소드를 재사용하기때문에 중복코드가 제거된다. 즉, 재사용성이 증가와 코드가 좀 더 깔끔해진다.
+- 그리고 유지보수하기도 쉬워진다. 변경사항이 일어난다면 ~QueryService에서만 수정하면 된다. 이는 버그발생의 위험도 줄여줄 것이다.
+- 하지만 Service 계층을 새롭게 추가했기때문에 해당 코드도 테스트 코드 작성을 해야하는 번거로움이 있었다.
