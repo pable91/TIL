@@ -17,8 +17,6 @@ public class BookUpdateService {
     }
 
     private User validate(final BookRequestDto.Add addBookRequestDto) {
-        // TODO
-        // 나중에 로그인 기능이 있다면 굳이 필요할까?
         final User findUser = userRepository.findById(addBookRequestDto.getUserId()).orElseThrow(() -> {
             throw new UserNotFoundException(addBookRequestDto.getUserId(), UserErrorCode.USER_NOT_FOUND);
         });
@@ -100,7 +98,7 @@ public class OrderBuyService {
 
 ### 해결책
 - Repository와 1:1 매핑되는 또 하나의 Service 계층을 구현하였다(네이밍은 ~QueryService로 구현하였음)
-- 이렇게 하면 기존 여러 Service들에서 ~QueryService의 메소드를 재사용하기때문에 중복코드가 제거된다. 즉, 재사용성이 증가한다.
+- 이렇게 하면 기존 여러 Service들에서 ~QueryService의 메소드를 재사용하기때문에 중복코드가 제거된다. 즉, 재사용성이 증가와 코드가 좀 더 깔끔해진다.
 - 하지만 Service 계층을 새롭게 추가했기때문에 해당 코드도 테스트 코드 작성을 해야하는 번거로움이 있었다.
 
 # Service 코드(수정후)
@@ -110,10 +108,6 @@ public class OrderBuyService {
 public class BookFindQueryService {
 
     private final BookRepository bookRepository;
-
-    public boolean isExist(final BookRequestDto.Add addBookRequestDto, final User findUser) {
-        return bookRepository.existsByNameAndUser(addBookRequestDto.getName(), findUser);
-    }
 
     public Book findById(final Long bookId) {
         return bookRepository.findById(bookId).orElseThrow(() -> {
@@ -149,4 +143,8 @@ public class BookUpdateService {
         }
         return findUser;
     }
+    
+    ...
+    ...
+    ...
 ```
