@@ -29,7 +29,8 @@ public enum ErrorCode {
 ```
 - 사용자 에러 + 공통 에러를 모두 ErrorCode enum에 정의하고 사용했었다.
 ### 문제
-- 위 코드처럼 관리하면 에러코드가 점점 늘어날 경우 ErrorCode enum이 너무 비대해진다.
+- 위 코드처럼 관리하면 에러코드가 늘어날 경우 ErrorCode enum이 너무 비대해진다.
+- 에러코드가 하나의 enum에서만 관리되기때문에 유지보수성이 떨어진다.
   
 # ErrorCode (수정후)
 ```
