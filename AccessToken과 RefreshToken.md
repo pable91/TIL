@@ -33,7 +33,7 @@
 - RefreshToken을 탈취당할 수 있다.
 
 # 탈취할 가능성을 줄이는 여러 방법들
-- RTR(Refresh Token Rotation) : Refresh Token을 가지고 갱신을 요청할때마다 새로운 AccessToken과 Refresh Token을 발급한다. 그러면 전에 사용되었던 Refresh Token은 탈취당해서 사용 불가능하다. 근데 한번도 사용되지 않은 Refresh Token을 탈취당하면 이건 답이 없다.
+- RTR(Refresh Token Rotation) : Refresh Token을 가지고 갱신을 요청할때마다 새로운 AccessToken과 Refresh Token을 발급한다. 그러면 전에 사용되었던 Refresh Token은 탈취당해서 사용 불가능하다. 그렇지만 Refresh Token을 탈취당하고 다시 재갱신하지 않으면 탈취당한 Refresh 은 유효하다는 맹점이 있다.
 - 최초로 접근해서 Refresh Token을 발급받은 IP를 서버에 저장한다. 다음에 이 IP에서 갱신요청이 온것이 아니라면 Token들을 모두 삭제하고 로그아웃 시키는 방법도 있다. 하지만 이방법은 사용자가 여러 IP를 사용한다고 하면, 로그아웃이 자주 일어날 수 있다는 문제가 있다.
 
 # 적용 코드
