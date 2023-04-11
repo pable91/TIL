@@ -21,7 +21,7 @@
 # RefreshToken의 장점
 - 짧은 만료시간을 가진 AccessToken이 만료 되었을 때, 사용자가 자주 로그인해야하는 문제를 해결해준다.
 
-# RefreshTokendms 어떤 형식으로 저장해야할까?
+# RefreshToken은 어떤 형식으로 저장해야할까?
 - 토큰방식
   - jwt 토큰방식이면 토큰 자체에 데이터를 담기때문에 AccessToken 처럼 stateless 방식이다. 이렇게 하면 DB같은곳에 데이터를 관리하지않아도 되지만 AccessToken처럼 탈취당했을때 서버에서 제어할 수 없는 단점이 있다.
 - UUID방식?
