@@ -86,4 +86,8 @@ bootJar {
     dependsOn copyDocument
 }
 ```
+- test 스코프에서 useJUnitPlatform 메소드를 삭제하였다. 더이상 라이브러리가 설정되지 않은채 테스트코드가 실행되지않기때문에 아까와 같은 에러는 발생하지 않는다.
 
+# 후기
+- gradle이나 build 스크립트쪽이 너무 서툴고 어렵다. 해당 이슈때메 하루종일 고생했다.
+- gradle(=groovy)을 한번쯤 제대로 파보는게 좋을것같음. 
