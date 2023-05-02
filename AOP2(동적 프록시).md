@@ -2,6 +2,7 @@
 - MVC 계층마다 log를 삽입하기로 했다.
 - log를 삽입할때 원본코드의 수정이 일어나지 않기 위해 프록시 개념을 사용하였다.
 - 인터페이스 기반 프록시 vs 구체클래스 기반 프록시
+https://github.com/pable91/TIL/blob/main/AOP1(%ED%94%84%EB%A1%9D%EC%8B%9C).md
 
 # 문제
 - 계층마다 프록시 클래스를 각각 구현해줘야해서 비효율적이다. 클래스들을 너무 많이 만들어야한다.
@@ -117,7 +118,7 @@ public class InterfaceConfig {
     }
 ```
 
-- Afte
+- After
 ``` java
 @Configuration
 public class DynamicProxyBasicConfig {
@@ -158,3 +159,8 @@ public class DynamicProxyBasicConfig {
     }
 }
 ```
+- Proxy.newProxyInstance라는 java 리플렉션 기술로 ***Proxy***를 생성한다. 그리고 생성할때 LogPrinterBasicHandler에는 모두 다른 인자(repository, service, controller)들이 들어간다. 이를 통해서 동적으로 프록시 생성이 가능해 진다.
+
+# JDK 동적 프록시 사용시 의존관계
+![의존관계](https://user-images.githubusercontent.com/22884224/235561822-a2a050b0-1868-4f49-9856-012b5a87216d.png)   
+![런타임 의존관계](https://user-images.githubusercontent.com/22884224/235561830-ca291dcc-24bd-4a55-ba0e-ec26918881f2.png)
