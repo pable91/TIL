@@ -16,7 +16,7 @@
 
 # JDK 동적 프록시
 - JDK 동적 프록시는 인터페이스 기반에서 동작하기때문에 인터페이스가 필히 있어야한다.
-- JDK 동적 프록시에 적용할 로직은 InvocationHandler 인터페이스를 구현해서 작성해야한다.
+- JDK 동적 프록시에 적용할 실행로직은 InvocationHandler 인터페이스를 구현해서 작성해야한다.
 ``` java
 public interface InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
@@ -165,3 +165,25 @@ public class DynamicProxyBasicConfig {
 # JDK 동적 프록시 사용시 의존관계
 ![의존관계](https://user-images.githubusercontent.com/22884224/235561822-a2a050b0-1868-4f49-9856-012b5a87216d.png)   
 ![런타임 의존관계](https://user-images.githubusercontent.com/22884224/235561830-ca291dcc-24bd-4a55-ba0e-ec26918881f2.png)
+
+# CGLIB
+- CGLIB를 사용하면 인터페이스가 없어도 ***구체클래스만 가지고 동적 프록시***를 만들어 낼 수 있다.
+- CGLIB에 적용할 실행로직은 MethodInterceptor를 인터페이스를 구현해서 작성해야한다.
+``` java
+public interface MethodInterceptor extends Callback {
+    Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable;
+}
+```
+- intercept 메소드에서 작성할 로직은 JDK 동적 프록시 때 작성한 LogPrinterBasicHandler invoke 메서드와 거의 비슷하다.
+
+# CGLIB 사용시 의존관계
+![CGLIB 의존관계](https://user-images.githubusercontent.com/22884224/235568174-ddc9db5d-4b04-48bb-bac2-cfcdccabccf0.png)
+
+# 또 다시 문제
+- 인터페이스가 있는 경우엔 JDK 동적 프록시, 그렇지 않은 경우엔 CGLIB를 적용해야한다.
+- 그럼 개발자는 상황에 맞게 JDK 동적 프록시와 CGLIB를 각각 적용해줘야할까? 
+- 사실 계층마다 로그를 추가해야한다라는 로직은 같다. 그렇기때문에  JDK 동적 프록시와 CGLIB를 동시에 구현하는것조차 중복 코드다.
+- JDK 동적 프록시를 써야하는지, CGLIB를 써야하는지, 조건에 맞게 알아서 적용되는 공통 로직은 없을까?
+- ***스프링에서 제공하는 ProxyFactory*** 를 사용하면 JDK 동적 프록시든 CGLIB든 알아서 생성 가능하다.
+- ![image](https://user-images.githubusercontent.com/22884224/235568874-dbd6c47d-4d22-477a-8ff4-047e8765bd53.png)
+
