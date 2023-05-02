@@ -1,8 +1,9 @@
 # 이전 상황
+- https://github.com/pable91/TIL/blob/main/AOP1(%ED%94%84%EB%A1%9D%EC%8B%9C).md
 - MVC 계층마다 log를 삽입하기로 했다.
 - log를 삽입할때 원본코드의 수정이 일어나지 않기 위해 프록시 개념을 사용하였다.
 - 인터페이스 기반 프록시 vs 구체클래스 기반 프록시
-https://github.com/pable91/TIL/blob/main/AOP1(%ED%94%84%EB%A1%9D%EC%8B%9C).md
+
 
 # 문제
 - 계층마다 프록시 클래스를 각각 구현해줘야해서 비효율적이다. 클래스들을 너무 많이 만들어야한다.
